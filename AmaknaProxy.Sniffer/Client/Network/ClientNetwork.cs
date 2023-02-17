@@ -62,7 +62,6 @@ namespace AmaknaProxy.Engine.Client.Network
 
         public void OpenConnection()
         {
-            WindowManager.MainWindow.Logger.Info("OpenConnection");
             try
             {
 
@@ -369,8 +368,8 @@ namespace AmaknaProxy.Engine.Client.Network
                 }
 
                 // here
-
-                if (message.MessageId == 8715 || message.MessageId == 9230) //9230 OK 17/02/2023
+                // MEMO - Pour trouver les Ids -> dans scripts/com/ankamagames/dofus/network/MessageReceiver.as
+                if (message.MessageId == 8715 || message.MessageId == 9230) //SelectedServerDataMessage - SelectedServerDataExtendedMessage
                 {
                     SelectedServerDataMessage msg = (SelectedServerDataMessage)message;
                     TicketsManager.RegisterTicket(Client.AccountName, Client.Network.Instance, msg);
@@ -381,13 +380,13 @@ namespace AmaknaProxy.Engine.Client.Network
                     Client.UnloadClient();
                 }
 
-                if (message.MessageId == 3593 || message.MessageId == 261)
+                if (message.MessageId == 3593 || message.MessageId == 261) // IdentificationSuccessMessage - IdentificationSuccessWithLoginTokenMessage (Surement pas necessaire)
                 {
                     IdentificationSuccessMessage msg = (IdentificationSuccessMessage)message;
                     Client.AccountName = msg.login;
                 }
 
-                if (message.MessageId == 3893)
+                if (message.MessageId == 3893) // CharacterSelectedSuccessMessage
                 {
                     CharacterSelectedSuccessMessage msg = (CharacterSelectedSuccessMessage)message;
 
@@ -396,6 +395,17 @@ namespace AmaknaProxy.Engine.Client.Network
                         Client.Dock.Text = msg.infos.name + " (" + Client.AccountName + ")";
                     });
                 }
+
+                // TODO - Faire le traitement des packets recus ici
+                // Exemple
+                if (message.MessageId == 8209) // TreasureHuntMessage
+                {
+                    TreasureHuntMessage msg = (TreasureHuntMessage)message;
+
+                    // msg.startMapId; Acces au propriétés
+                    WindowManager.MainWindow.Logger.Info("TreasureHuntMessage, mapID: " + msg.startMapId + ", flags posés: " + msg.flags.Count());
+                }
+
 
                 if (!message.Cancel)
                 {

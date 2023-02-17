@@ -49,8 +49,6 @@ namespace AmaknaProxy.Engine.Client
 
         public void LoadClient()
         {
-            WindowManager.MainWindow.Logger.Info("LoadClient");
-
             try
             {
                 if (!Silent)

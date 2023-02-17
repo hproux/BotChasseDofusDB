@@ -66,8 +66,6 @@ namespace AmaknaProxy.Engine.Managers
 
         public static MainClient RegisterClient(Socket sock, bool silent)
         {
-            WindowManager.MainWindow.Logger.Info("RegisterClient");
-
             lock (CheckLock)
             {
                 MainClient client = new MainClient(sock, silent);

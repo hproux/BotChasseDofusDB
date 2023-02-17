@@ -42,7 +42,6 @@ namespace AmaknaProxy.Engine.Managers
             {
                 Login_Server = new SimpleServer();
                 Game_Server = new SimpleServer();
-                WindowManager.MainWindow.Logger.Info("StartServers Network manager l.45");
 
                 Login_Server.ConnectionAccepted += Login_ConnectionAccepted;
                 Game_Server.ConnectionAccepted += Game_ConnectionAccepted;
