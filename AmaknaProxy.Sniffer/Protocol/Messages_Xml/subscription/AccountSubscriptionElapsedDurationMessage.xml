@@ -1,0 +1,5 @@
+﻿<XmlMessage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="AccountSubscriptionElapsedDurationMessage" Id="3364" Heritage="Message">
+	<Fields>
+		<XmlField Name="subscriptionElapsedDuration" Type="double" Condition="subscriptionElapsedDuration &lt; 0 || subscriptionElapsedDuration &gt; 9007199254740992" />
+	</Fields>
+</XmlMessage>

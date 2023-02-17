@@ -1,0 +1,7 @@
+﻿<XmlMessage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="RemoveSpellModifierMessage" Id="2668" Heritage="Message">
+	<Fields>
+		<XmlField Name="actorId" Type="double" Condition="actorId &lt; -9007199254740992 || actorId &gt; 9007199254740992" />
+		<XmlField Name="modificationType" Type="sbyte" Condition="modificationType &lt; 0" />
+		<XmlField Name="spellId" Type="varuhshort" Condition="spellId &lt; 0" />
+	</Fields>
+</XmlMessage>
