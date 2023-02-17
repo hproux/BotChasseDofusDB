@@ -63,7 +63,7 @@ namespace AmaknaProxy.Engine.View
             this.GroupBox_Packets.Size = new System.Drawing.Size(337, 528);
             this.GroupBox_Packets.TabIndex = 2;
             this.GroupBox_Packets.TabStop = false;
-            this.GroupBox_Packets.Text = "Lista de paquetes recibidos/enviados";
+            this.GroupBox_Packets.Text = "Liste des paquets reçus / envoyés";
             // 
             // button1
             // 
@@ -73,7 +73,7 @@ namespace AmaknaProxy.Engine.View
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(331, 23);
             this.button1.TabIndex = 2;
-            this.button1.Text = "Guardar Json";
+            this.button1.Text = "Enregistrer Json";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -87,7 +87,7 @@ namespace AmaknaProxy.Engine.View
             this.CheckBox_Enable.Name = "CheckBox_Enable";
             this.CheckBox_Enable.Size = new System.Drawing.Size(331, 17);
             this.CheckBox_Enable.TabIndex = 3;
-            this.CheckBox_Enable.Text = "Activado";
+            this.CheckBox_Enable.Text = "Activé";
             this.CheckBox_Enable.UseVisualStyleBackColor = true;
             // 
             // DataGridView_PacketsList
@@ -112,7 +112,7 @@ namespace AmaknaProxy.Engine.View
             // Column_Hour
             // 
             this.Column_Hour.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
-            this.Column_Hour.HeaderText = "Hora";
+            this.Column_Hour.HeaderText = "Heure";
             this.Column_Hour.MinimumWidth = 45;
             this.Column_Hour.Name = "Column_Hour";
             this.Column_Hour.ReadOnly = true;
@@ -121,7 +121,7 @@ namespace AmaknaProxy.Engine.View
             // Column_Origin
             // 
             this.Column_Origin.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
-            this.Column_Origin.HeaderText = "Origen";
+            this.Column_Origin.HeaderText = "Origine";
             this.Column_Origin.MinimumWidth = 50;
             this.Column_Origin.Name = "Column_Origin";
             this.Column_Origin.ReadOnly = true;
@@ -151,7 +151,7 @@ namespace AmaknaProxy.Engine.View
             this.Button_Clean.Name = "Button_Clean";
             this.Button_Clean.Size = new System.Drawing.Size(331, 24);
             this.Button_Clean.TabIndex = 1;
-            this.Button_Clean.Text = "Ver historial";
+            this.Button_Clean.Text = "Voir l'historique";
             this.Button_Clean.UseVisualStyleBackColor = true;
             this.Button_Clean.Click += new System.EventHandler(this.Button_Clean_Click);
             // 
@@ -181,7 +181,7 @@ namespace AmaknaProxy.Engine.View
             this.GroupBox_Details.Size = new System.Drawing.Size(341, 528);
             this.GroupBox_Details.TabIndex = 3;
             this.GroupBox_Details.TabStop = false;
-            this.GroupBox_Details.Text = "Información del paquete";
+            this.GroupBox_Details.Text = "Informations sur le paquet";
             // 
             // TreeView_InfosPacket
             // 

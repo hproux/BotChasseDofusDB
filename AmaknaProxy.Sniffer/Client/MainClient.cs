@@ -8,6 +8,7 @@ using AmaknaProxy.Engine.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,6 +49,8 @@ namespace AmaknaProxy.Engine.Client
 
         public void LoadClient()
         {
+            WindowManager.MainWindow.Logger.Info("LoadClient");
+
             try
             {
                 if (!Silent)

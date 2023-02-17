@@ -64,7 +64,7 @@ namespace AmaknaProxy.Sniffer
             try
             {
                 NetworkManager.StartServers();
-                logger.Debug("Les serveurs ont démarré.");
+                logger.Debug("Les serveurs ont démarrés.");
             }
             catch (Exception ex)
             {

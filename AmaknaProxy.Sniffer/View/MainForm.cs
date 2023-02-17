@@ -143,7 +143,7 @@ namespace AmaknaProxy.Engine.View
             try
             {
                 //System.Diagnostics.Process.Start(Path.Combine((string)ConfigurationManager.GetEntryByName("GamePath").Value, @"Dofus.exe"));
-                System.Diagnostics.Process.Start(Path.Combine((string)ConfigurationManager.GetEntryByName("GamePath").Value, @"Dofus.exe"));
+                System.Diagnostics.Process.Start(Path.Combine((string)ConfigurationManager.GetEntryByName("GamePath").Value, @"Ankama Launcher.exe"));
             }
             catch (Exception)
             { }

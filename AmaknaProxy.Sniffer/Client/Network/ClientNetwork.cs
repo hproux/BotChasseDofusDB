@@ -62,6 +62,7 @@ namespace AmaknaProxy.Engine.Client.Network
 
         public void OpenConnection()
         {
+            WindowManager.MainWindow.Logger.Info("OpenConnection");
             try
             {
 
@@ -82,6 +83,7 @@ namespace AmaknaProxy.Engine.Client.Network
                     string address = Constants.LoginAddresses[Rnd.Next(0, Constants.LoginAddresses.Length)];
                     short port = (short)Constants.LoginPorts[Rnd.Next(0, Constants.LoginPorts.Length)];
 
+                    WindowManager.MainWindow.Logger.Info("Client.Silent address / port: " + address + "/" + port);
                     ServerConnection.Start(address, port);
                 }
                 else
@@ -94,6 +96,7 @@ namespace AmaknaProxy.Engine.Client.Network
                     string address = Dns.GetHostAddresses(msg.ServerMsg.address)[Rnd.Next(0, Dns.GetHostAddresses(msg.ServerMsg.address).Length)].ToString();
                     short port = (short)msg.ServerMsg.ports[Rnd.Next(0, msg.ServerMsg.ports.Length)];
 
+                    WindowManager.MainWindow.Logger.Info("Client.Silent Else address / port: " + address + "/" + port);
                     ServerConnection.Start(address, port);
                 }
             }
@@ -367,7 +370,7 @@ namespace AmaknaProxy.Engine.Client.Network
 
                 // here
 
-                if (message.MessageId == 1568 || message.MessageId == 900)
+                if (message.MessageId == 8715 || message.MessageId == 9230) //9230 OK 17/02/2023
                 {
                     SelectedServerDataMessage msg = (SelectedServerDataMessage)message;
                     TicketsManager.RegisterTicket(Client.AccountName, Client.Network.Instance, msg);
@@ -378,13 +381,13 @@ namespace AmaknaProxy.Engine.Client.Network
                     Client.UnloadClient();
                 }
 
-                if (message.MessageId == 7272)
+                if (message.MessageId == 3593 || message.MessageId == 261)
                 {
                     IdentificationSuccessMessage msg = (IdentificationSuccessMessage)message;
                     Client.AccountName = msg.login;
                 }
 
-                if (message.MessageId == 7662)
+                if (message.MessageId == 3893)
                 {
                     CharacterSelectedSuccessMessage msg = (CharacterSelectedSuccessMessage)message;
 

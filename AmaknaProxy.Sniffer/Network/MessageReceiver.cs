@@ -34,7 +34,7 @@ namespace AmaknaProxy.API.Protocol
                 NetworkMessage message = m_constructors[id]();
 
                 if (message == null)
-                    throw new MessageNotFoundException(string.Format("Constructors[{0}] (delegate {1}) no existe", id, m_messages[id]));
+                    throw new MessageNotFoundException(string.Format("Constructor[{0}] (delegate {1}) unknown", id, m_messages[id]));
 
                 try
                 {
@@ -42,7 +42,7 @@ namespace AmaknaProxy.API.Protocol
                 }
                 catch (Exception ex)
                 {
-                    ConsoleManager.Error(string.Format("No se puede deserializar el mensaje para la id {0} ({1}).", id, ex.Message));
+                    ConsoleManager.Error(string.Format("Impossible de désérialiser le message pour l'id {0} ({1}).", id, ex.Message));
                     return message;
                 }
 
@@ -50,7 +50,7 @@ namespace AmaknaProxy.API.Protocol
             }
             catch(Exception ex)
             {
-                ConsoleManager.Error(string.Format("No se puede construir un mensaje para id {0} ({1}).", id, ex.Message));
+                ConsoleManager.Error(string.Format("Impossible de créer un message pour l'id {0} ({1}).", id, ex.Message));
                 return null;
             }
         }
@@ -72,7 +72,7 @@ namespace AmaknaProxy.API.Protocol
                     if (m_messages.ContainsKey(id))
                         throw new AmbiguousMatchException(
                             string.Format(
-                                "MessageReceiver() => {0} el elemento ya está en el diccionario, el tipo antiguo es : {1}, el nuevo tipo es  {2}",
+                                "MessageReceiver() => {0} l'élément est déjà dans le dictionnaire, l'ancien type est : {1}, le nouveau type est {2}",
                                 id, m_messages[id], type));
 
                     m_messages.Add(id, type);
@@ -81,7 +81,7 @@ namespace AmaknaProxy.API.Protocol
 
                     if (ctor == null)
                         throw new System.Exception(
-                            string.Format("'{0}' no implementa un constructor sin parámetros",
+                            string.Format("'{0}' n'implemente pas de constructeur sans paramètres",
                                           type));
 
                     m_constructors.Add(id, ctor.CreateDelegate<Func<NetworkMessage>>());
@@ -92,7 +92,7 @@ namespace AmaknaProxy.API.Protocol
         public static Type GetMessageType(uint id)
         {
             if (!m_messages.ContainsKey(id))
-                throw new MessageNotFoundException(string.Format("NetworkMessage <id:{0}> doesn't exist", id));
+                throw new MessageNotFoundException(string.Format("NetworkMessage <id:{0}> inconnu", id));
 
             return m_messages[id];
         }

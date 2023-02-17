@@ -1,4 +1,5 @@
-﻿using AmaknaProxy.Engine.Client;
+﻿using AmaknaProxy.API.Managers;
+using AmaknaProxy.Engine.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,7 +66,9 @@ namespace AmaknaProxy.Engine.Managers
 
         public static MainClient RegisterClient(Socket sock, bool silent)
         {
-            lock(CheckLock)
+            WindowManager.MainWindow.Logger.Info("RegisterClient");
+
+            lock (CheckLock)
             {
                 MainClient client = new MainClient(sock, silent);
                 client.ClientUnloaded += ClientUnloaded;

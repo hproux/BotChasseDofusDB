@@ -127,7 +127,7 @@ namespace AmaknaProxy.Engine.View
             }
             catch (Exception ex)
             {
-                WindowManager.MainWindow.Logger.Error("(Debug) No puedo agregar un mensaje -> " + ex.Message);
+                WindowManager.MainWindow.Logger.Error("(Debug)  " + ex.Message);
             }
         }
 

@@ -42,6 +42,7 @@ namespace AmaknaProxy.Engine.Managers
             {
                 Login_Server = new SimpleServer();
                 Game_Server = new SimpleServer();
+                WindowManager.MainWindow.Logger.Info("StartServers Network manager l.45");
 
                 Login_Server.ConnectionAccepted += Login_ConnectionAccepted;
                 Game_Server.ConnectionAccepted += Game_ConnectionAccepted;
@@ -84,13 +85,13 @@ namespace AmaknaProxy.Engine.Managers
 
         private static void Login_ConnectionAccepted(Socket sender)
         {
-            WindowManager.MainWindow.Logger.Info("Nuevo cliente en el servidor de autenticación.");
+            WindowManager.MainWindow.Logger.Info("Nouveau client sur le serveur d'authentification.");
             ClientsManager.RegisterClient(sender, true);
         }
 
         private static void Game_ConnectionAccepted(Socket sender)
         {
-            WindowManager.MainWindow.Logger.Info("Nuevo cliente en el servidor del juego.");
+            WindowManager.MainWindow.Logger.Info("Nouveau client sur le serveur de jeu.");
             ClientsManager.RegisterClient(sender, false);
         }
 
