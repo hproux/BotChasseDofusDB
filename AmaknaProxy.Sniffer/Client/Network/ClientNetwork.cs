@@ -22,6 +22,7 @@ using AmaknaProxy.Engine.View;
 using Newtonsoft.Json;
 using AmaknaProxy.Sniffer.Bot;
 using static AmaknaProxy.Sniffer.Bot.Chasse;
+using static AmaknaProxy.Sniffer.Constants;
 
 namespace AmaknaProxy.Engine.Client.Network
 {
@@ -375,9 +376,9 @@ namespace AmaknaProxy.Engine.Client.Network
                     return;
                 }
 
-                // here
+                // * GESTION DES EVENEMENTS *
                 // MEMO - Pour trouver les Ids -> dans scripts/com/ankamagames/dofus/network/MessageReceiver.as
-                if (message.MessageId == 8715 || message.MessageId == 9230) //SelectedServerDataMessage - SelectedServerDataExtendedMessage
+                if (message.MessageId == (uint)MessageReceiverEnum.SelectedServerDataMessage || message.MessageId == (uint)MessageReceiverEnum.SelectedServerDataExtendedMessage)
                 {
                     SelectedServerDataMessage msg = (SelectedServerDataMessage)message;
                     TicketsManager.RegisterTicket(Client.AccountName, Client.Network.Instance, msg);
@@ -388,13 +389,13 @@ namespace AmaknaProxy.Engine.Client.Network
                     Client.UnloadClient();
                 }
 
-                if (message.MessageId == 3593 || message.MessageId == 261) // IdentificationSuccessMessage - IdentificationSuccessWithLoginTokenMessage (Surement pas necessaire)
+                if (message.MessageId == (uint)MessageReceiverEnum.IdentificationSuccessMessage || message.MessageId == (uint)MessageReceiverEnum.IdentificationSuccessWithLoginTokenMessage)
                 {
                     IdentificationSuccessMessage msg = (IdentificationSuccessMessage)message;
                     Client.AccountName = msg.login;
                 }
 
-                if (message.MessageId == 3893) // CharacterSelectedSuccessMessage
+                if (message.MessageId == (uint)MessageReceiverEnum.CharacterSelectedSuccessMessage)
                 {
                     CharacterSelectedSuccessMessage msg = (CharacterSelectedSuccessMessage)message;
 
@@ -404,48 +405,20 @@ namespace AmaknaProxy.Engine.Client.Network
                     });
                 }
 
-                // TODO - Faire le traitement des packets recus ici
-                // Exemple
-                if (message.MessageId == 8209) // TreasureHuntMessage
+                // Chargement d'une nouvelle map
+                if (message.MessageId == (uint)MessageReceiverEnum.MapComplementaryInformationsDataMessage)
+                {
+                    MapComplementaryInformationsDataMessage objCurrentMap = (MapComplementaryInformationsDataMessage)message;
+
+                    objChasse.eventMapChange(objCurrentMap);
+                }
+
+                // Evenement de chasse au tresor -> Nouvelle chasse / pose d'un jalon / Validation...
+                if (message.MessageId == (uint)MessageReceiverEnum.TreasureHuntMessage)
                 {
                     TreasureHuntMessage msg = (TreasureHuntMessage)message;
 
-                    int nbCurrentIndice = msg.flags.Count();
-
-                    TreasureHuntStep currentStep = msg.knownStepsList[nbCurrentIndice];
-
-                    if (currentStep != null)
-                    {
-                        string labelId = "";
-                        string direction = "";
-
-                        if (currentStep.TypeId == TreasureHuntStepFollowDirectionToHint.Id) // Cas phorreurs
-                        {
-                            TreasureHuntStepFollowDirectionToHint directionToHint = (TreasureHuntStepFollowDirectionToHint)currentStep;
-                            labelId = directionToHint.npcId.ToString() + " (Hint)";
-                            direction = directionToHint.direction.ToString();
-
-                        } else if (currentStep.TypeId == TreasureHuntStepFollowDirectionToPOI.Id)
-                        {
-                            TreasureHuntStepFollowDirectionToPOI directionToPOI = (TreasureHuntStepFollowDirectionToPOI)currentStep;
-                            labelId = directionToPOI.poiLabelId.ToString() + " (POI)";
-                            direction = directionToPOI.direction.ToString();
-                        }
-
-
-                        MapPositions objPos;
-
-                        if (msg.flags.Count() > 0) // Si des flags on déjà été posés on récupère la derniere pos
-                        {
-                            objPos = objChasse.getPosFromMapId(msg.flags.Last().mapId);
-                        } else // Position de start de la chasse
-                        {
-                            objPos = objChasse.getPosFromMapId(msg.startMapId);
-                        }
-
-                        WindowManager.MainWindow.Logger.Info("TreasureHuntMessage, map X: " + objPos.posX + ", map Y: " + objPos.posY + ", flags posés: " + nbCurrentIndice + ", Indice ID: " + labelId + ", direction: " + direction);
-
-                    }
+                    objChasse.eventChasse(msg);
                 }
 
 

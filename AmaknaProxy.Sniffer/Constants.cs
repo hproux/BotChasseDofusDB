@@ -12,5 +12,20 @@ namespace AmaknaProxy.Sniffer
 
         public static int[] LoginPorts = { 5555, 443 };
 
+        public enum MessageReceiverEnum
+        {
+            // Connexion
+            SelectedServerDataMessage = 8715,
+            SelectedServerDataExtendedMessage = 9230,
+            IdentificationSuccessMessage = 3593,
+            IdentificationSuccessWithLoginTokenMessage = 261,
+            CharacterSelectedSuccessMessage = 3893,
+
+            // Deplacements
+            MapComplementaryInformationsDataMessage = 4524,
+
+            // Chasse
+            TreasureHuntMessage = 8209
+        }
     }
 }
