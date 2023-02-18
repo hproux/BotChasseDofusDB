@@ -114,6 +114,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bot\Chasse.cs" />
     <Compile Include="Client\Enums\ClientConfigType.cs" />
     <Compile Include="Client\Enums\ClientConnectionState.cs" />
     <Compile Include="Client\Enums\ClientStateEnum.cs" />
@@ -670,6 +671,7 @@
     <Compile Include="Protocol\Messages\game\context\roleplay\DiceRollRequestMessage.cs" />
     <Compile Include="Protocol\Messages\game\context\roleplay\document\DocumentReadingBeginMessage.cs" />
     <Compile Include="Protocol\Messages\game\context\roleplay\emote\EmoteAddMessage.cs" />
+    <Compile Include="Protocol\Messages\game\context\roleplay\emote\EmoteListMessage.cs" />
     <Compile Include="Protocol\Messages\game\context\roleplay\emote\EmotePlayAbstractMessage.cs" />
     <Compile Include="Protocol\Messages\game\context\roleplay\emote\EmotePlayErrorMessage.cs" />
     <Compile Include="Protocol\Messages\game\context\roleplay\emote\EmotePlayMassiveMessage.cs" />
@@ -1805,6 +1807,7 @@
     <EmbeddedResource Include="View\PathForm.resx">
       <DependentUpon>PathForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="Json\MapPositions.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

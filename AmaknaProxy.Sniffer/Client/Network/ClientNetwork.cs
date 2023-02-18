@@ -17,6 +17,11 @@ using System.Net;
 using AmaknaProxy.Sniffer;
 using AmaknaProxy.API.Client.Enums;
 using System.Windows.Forms;
+using AmaknaProxy.API.Protocol.Types;
+using AmaknaProxy.Engine.View;
+using Newtonsoft.Json;
+using AmaknaProxy.Sniffer.Bot;
+using static AmaknaProxy.Sniffer.Bot.Chasse;
 
 namespace AmaknaProxy.Engine.Client.Network
 {
@@ -32,7 +37,7 @@ namespace AmaknaProxy.Engine.Client.Network
         public SimpleClient ServerConnection { get; set; }
 
         public Socket Sock;
-        
+
         public Dictionary<int, List<MonitorPacketDelegate>> Frames { get; set; }
 
         public bool Ticket;
@@ -42,6 +47,8 @@ namespace AmaknaProxy.Engine.Client.Network
         private Random Rnd;
 
         public uint Instance { get; set; }
+
+        public Chasse objChasse;
         #endregion
 
         #region Builder
@@ -54,6 +61,7 @@ namespace AmaknaProxy.Engine.Client.Network
             Ticket = false;
             Instance = _instance;
             Rnd = new Random();
+            objChasse = new Chasse();
         }
 
         #endregion
@@ -402,8 +410,42 @@ namespace AmaknaProxy.Engine.Client.Network
                 {
                     TreasureHuntMessage msg = (TreasureHuntMessage)message;
 
-                    // msg.startMapId; Acces au propriétés
-                    WindowManager.MainWindow.Logger.Info("TreasureHuntMessage, mapID: " + msg.startMapId + ", flags posés: " + msg.flags.Count());
+                    int nbCurrentIndice = msg.flags.Count();
+
+                    TreasureHuntStep currentStep = msg.knownStepsList[nbCurrentIndice];
+
+                    if (currentStep != null)
+                    {
+                        string labelId = "";
+                        string direction = "";
+
+                        if (currentStep.TypeId == TreasureHuntStepFollowDirectionToHint.Id) // Cas phorreurs
+                        {
+                            TreasureHuntStepFollowDirectionToHint directionToHint = (TreasureHuntStepFollowDirectionToHint)currentStep;
+                            labelId = directionToHint.npcId.ToString() + " (Hint)";
+                            direction = directionToHint.direction.ToString();
+
+                        } else if (currentStep.TypeId == TreasureHuntStepFollowDirectionToPOI.Id)
+                        {
+                            TreasureHuntStepFollowDirectionToPOI directionToPOI = (TreasureHuntStepFollowDirectionToPOI)currentStep;
+                            labelId = directionToPOI.poiLabelId.ToString() + " (POI)";
+                            direction = directionToPOI.direction.ToString();
+                        }
+
+
+                        MapPositions objPos;
+
+                        if (msg.flags.Count() > 0) // Si des flags on déjà été posés on récupère la derniere pos
+                        {
+                            objPos = objChasse.getPosFromMapId(msg.flags.Last().mapId);
+                        } else // Position de start de la chasse
+                        {
+                            objPos = objChasse.getPosFromMapId(msg.startMapId);
+                        }
+
+                        WindowManager.MainWindow.Logger.Info("TreasureHuntMessage, map X: " + objPos.posX + ", map Y: " + objPos.posY + ", flags posés: " + nbCurrentIndice + ", Indice ID: " + labelId + ", direction: " + direction);
+
+                    }
                 }
 
 

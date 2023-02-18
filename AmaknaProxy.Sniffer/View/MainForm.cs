@@ -3,6 +3,7 @@ using AmaknaProxy.Engine.Managers;
 using AmaknaProxy.Engine.Utils.Config;
 using AmaknaProxy.Engine.Utils.Injector;
 using AmaknaProxy.Sniffer;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

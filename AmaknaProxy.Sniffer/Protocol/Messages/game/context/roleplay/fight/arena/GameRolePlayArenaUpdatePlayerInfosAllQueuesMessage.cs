@@ -17,7 +17,7 @@
 
 
 
-// Generated on 02/17/2023 18:45:15
+// Generated on 02/18/2023 13:02:21
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +31,7 @@ namespace AmaknaProxy.API.Protocol.Messages
 public class GameRolePlayArenaUpdatePlayerInfosAllQueuesMessage : GameRolePlayArenaUpdatePlayerInfosMessage
 {
 
-public const uint Id = 6951;
+public new const uint Id = 6951;
 public override uint MessageId
 {
     get { return Id; }
