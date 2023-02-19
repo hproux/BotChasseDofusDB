@@ -11,11 +11,6 @@ namespace AmaknaProxy.Sniffer.Bot
 {
     public class Chasse
     {
-        public bool isActive = true; // TODO -> Gérer le booleen via une checkbox
-        public double currentStartMapId { get; set; }
-        public MapPositions startMap { get; set; } // Contient la map de départ de l'indice courant
-        private List<MapPositions> gListeMapsPositions { get; set; } // correspondances mapId -> Coordonées X/Y
-
         #region Structures
         public struct MapPositions
         {
@@ -23,11 +18,30 @@ namespace AmaknaProxy.Sniffer.Bot
             public string posX;
             public string posY;
         }
+
+        public struct PointOfInterestLabel
+        {
+            public uint id;
+            public string label;
+        }
+
         #endregion
+
+        public bool isActive { get; set; }
+        public double currentStartMapId { get; set; }
+        public MapPositions startMap { get; set; } // Contient la map de départ de l'indice courant
+        public List<MapPositions> gListeMapsPositions { get; set; } // correspondances mapId -> Coordonées X/Y
+
+        public List<PointOfInterestLabel> gListeLabelPOI { get; set; } // Contient les libellé de chaque POI
+
+        public uint? idPhorreurToFind { get; set; } // Si renseigné, on recherche actuellement un phorreur
 
         // Constructeur
         public Chasse()
         {
+            isActive = true; // TODO -> Gérer le booleen via une checkbox
+            idPhorreurToFind = null;
+
             // ** Chargement des fichiers JSON **
             // Chargement des correspondances mapId -> Coordonées X/Y
             WindowManager.MainWindow.Logger.Info("Chargement des correspondances mapId -> Coordonées X/Y");
@@ -39,6 +53,17 @@ namespace AmaknaProxy.Sniffer.Bot
             }
 
             WindowManager.MainWindow.Logger.Info(gListeMapsPositions.Count() + " maps trouvées");
+
+            // Chargement des POIs et de leurs libelles
+            WindowManager.MainWindow.Logger.Info("Chargement des indices connus");
+
+            using (StreamReader r = new StreamReader("Json/idToLibellePOI.json"))
+            {
+                string json = r.ReadToEnd();
+                gListeLabelPOI = JsonConvert.DeserializeObject<List<PointOfInterestLabel>>(json);//Contient tous les indices de chasses (POI) id + libelle
+            }
+
+            WindowManager.MainWindow.Logger.Info(gListeLabelPOI.Count() + " indices trouvés");
         }
 
         public MapPositions getPosFromMapId(double pMapId)
@@ -46,6 +71,30 @@ namespace AmaknaProxy.Sniffer.Bot
             MapPositions objMapPosition = gListeMapsPositions.Find(elem => elem.id == pMapId);
 
             return objMapPosition;
+        }
+
+        public string getLibelleIndiceFromPoiId(uint idPOI)
+        {
+            PointOfInterestLabel objIndice = gListeLabelPOI.Find(indice => indice.id == idPOI);
+
+            return objIndice.label;
+        }
+
+        public bool isPhorreurOnMap(uint idPhorreur, GameRolePlayActorInformations[] listeActorsOnMap) // Retourne true si le phorreur recherché est présent sur la map
+        {
+            foreach (GameRolePlayActorInformations objActor in listeActorsOnMap) { 
+                if (objActor is GameRolePlayTreasureHintInformations)
+                {
+                    GameRolePlayTreasureHintInformations objPhorreur = (GameRolePlayTreasureHintInformations)objActor;
+
+                    if (objPhorreur.npcId == idPhorreur)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         // Evenement de changement de map
@@ -64,6 +113,16 @@ namespace AmaknaProxy.Sniffer.Bot
                         if (startMap.id == currentPosXY.id)
                         {
                             WindowManager.MainWindow.Logger.Info("Position de départ de l'indice");
+                            // TODO -> Demarrage de la chasse
+                        }
+
+                        if (idPhorreurToFind != null)
+                        {
+                            if(isPhorreurOnMap(idPhorreurToFind.Value, pObjCurrentMap.actors) == true)
+                            {
+                                WindowManager.MainWindow.Logger.Info("Phorreur trouvé");
+                                // TODO Cliquer sur le jalon
+                            }
                         }
                     }
 
@@ -80,6 +139,7 @@ namespace AmaknaProxy.Sniffer.Bot
         public void eventChasse(TreasureHuntMessage pEventChasse)
         {
             startMap = new MapPositions();
+            idPhorreurToFind = null;
 
             try {
                 if (isActive)
@@ -101,13 +161,14 @@ namespace AmaknaProxy.Sniffer.Bot
                             {
                                 TreasureHuntStepFollowDirectionToHint directionToHint = (TreasureHuntStepFollowDirectionToHint)currentStep;
                                 labelId = directionToHint.npcId.ToString() + " (Hint)";
+                                idPhorreurToFind = directionToHint.npcId; // On indique qu'on recherche un phorreur
                                 direction = directionToHint.direction.ToString();
 
                             }
                             else if (currentStep.TypeId == TreasureHuntStepFollowDirectionToPOI.Id)
                             {
                                 TreasureHuntStepFollowDirectionToPOI directionToPOI = (TreasureHuntStepFollowDirectionToPOI)currentStep;
-                                labelId = directionToPOI.poiLabelId.ToString() + " (POI)";
+                                labelId = directionToPOI.poiLabelId.ToString() + " (POI: " + getLibelleIndiceFromPoiId(directionToPOI.poiLabelId) + ")";
                                 direction = directionToPOI.direction.ToString();
                             }
 
