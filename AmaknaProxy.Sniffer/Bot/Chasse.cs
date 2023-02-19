@@ -13,6 +13,7 @@ namespace AmaknaProxy.Sniffer.Bot
     {
         public bool isActive = true; // TODO -> Gérer le booleen via une checkbox
         public double currentStartMapId { get; set; }
+        public MapPositions startMap { get; set; } // Contient la map de départ de l'indice courant
         private List<MapPositions> gListeMapsPositions { get; set; } // correspondances mapId -> Coordonées X/Y
 
         #region Structures
@@ -47,6 +48,7 @@ namespace AmaknaProxy.Sniffer.Bot
             return objMapPosition;
         }
 
+        // Evenement de changement de map
         public void eventMapChange(MapComplementaryInformationsDataMessage pObjCurrentMap)
         {
             try
@@ -54,7 +56,17 @@ namespace AmaknaProxy.Sniffer.Bot
                 if(isActive)
                 {
                     MapPositions currentPosXY = getPosFromMapId(pObjCurrentMap.mapId);
+
                     WindowManager.MainWindow.Logger.Info("Changement de map -> id: " + pObjCurrentMap.mapId + ", X: " + currentPosXY.posX + ", Y:" + currentPosXY.posY);
+                    
+                    if (startMap.id != 0)
+                    {
+                        if (startMap.id == currentPosXY.id)
+                        {
+                            WindowManager.MainWindow.Logger.Info("Position de départ de l'indice");
+                        }
+                    }
+
                 }
 
             } 
@@ -64,15 +76,20 @@ namespace AmaknaProxy.Sniffer.Bot
             }
         }
 
+        // Evenement de reception d'une tramme de chasse 
         public void eventChasse(TreasureHuntMessage pEventChasse)
         {
+            startMap = new MapPositions();
+
             try {
                 if (isActive)
                 {
+                    // Si chasse non terminée
                     if (pEventChasse.totalStepCount > 0)
                     {
                         int nbCurrentFlag = pEventChasse.flags.Count();
 
+                        // Si etape non terminée
                         if (nbCurrentFlag < pEventChasse.knownStepsList.Count())
                         {
                             TreasureHuntStep currentStep = pEventChasse.knownStepsList[nbCurrentFlag];
@@ -105,6 +122,8 @@ namespace AmaknaProxy.Sniffer.Bot
                             {
                                 objPos = getPosFromMapId(pEventChasse.startMapId);
                             }
+
+                            startMap = objPos;
 
                             WindowManager.MainWindow.Logger.Info("TreasureHuntMessage, map X: " + objPos.posX + ", map Y: " + objPos.posY + ", flags posés: " + nbCurrentFlag + ", Indice ID: " + labelId + ", direction: " + direction);
 
