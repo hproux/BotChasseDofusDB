@@ -3,6 +3,7 @@ using AmaknaProxy.Engine.Managers;
 using AmaknaProxy.Engine.Utils.Config;
 using AmaknaProxy.Engine.Utils.Injector;
 using AmaknaProxy.Sniffer;
+using AmaknaProxy.Sniffer.View;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -195,6 +196,17 @@ namespace AmaknaProxy.Engine.View
         #region Events
 
         #endregion
-        
+
+        private void DockPanel_Main_ActiveContentChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void paramètrageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Parametrage fenParam = new Parametrage();
+
+            fenParam.ShowDialog();
+        }
     }
 }

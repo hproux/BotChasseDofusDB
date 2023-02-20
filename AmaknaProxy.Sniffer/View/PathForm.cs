@@ -47,5 +47,10 @@ namespace AmaknaProxy.Engine.View
         }
 
         #endregion
+
+        private void Label_PathTxt_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

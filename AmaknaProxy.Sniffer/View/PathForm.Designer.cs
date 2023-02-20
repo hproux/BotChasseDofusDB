@@ -57,9 +57,11 @@
             this.Label_PathTxt.AutoSize = true;
             this.Label_PathTxt.Location = new System.Drawing.Point(9, 13);
             this.Label_PathTxt.Name = "Label_PathTxt";
-            this.Label_PathTxt.Size = new System.Drawing.Size(281, 13);
+            this.Label_PathTxt.Size = new System.Drawing.Size(447, 13);
             this.Label_PathTxt.TabIndex = 3;
-            this.Label_PathTxt.Text = "Entrez le chemin d'accès à votre répertoire de jeu.\r\n";
+            this.Label_PathTxt.Text = "Entrez le répertoire du jeu (généralement C:\\Program Files\\Ankama\\Ankama Launcher" +
+    ")";
+            this.Label_PathTxt.Click += new System.EventHandler(this.Label_PathTxt_Click);
             // 
             // Button_Browse
             // 
@@ -87,7 +89,7 @@
             this.MinimizeBox = false;
             this.Name = "PathForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-                this.Text = "Chemin d'accès";
+            this.Text = "Chemin d\'accès";
             this.TopMost = true;
             this.ResumeLayout(false);
             this.PerformLayout();

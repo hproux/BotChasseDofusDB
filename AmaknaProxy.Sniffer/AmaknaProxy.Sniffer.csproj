@@ -1764,6 +1764,7 @@
     <Compile Include="Protocol\Types\web\haapi\BufferInformation.cs" />
     <Compile Include="Utils\Config\ConfigEntry.cs" />
     <Compile Include="Utils\Config\ConfigType.cs" />
+    <Compile Include="Bot\InteractionsUI.cs" />
     <Compile Include="Utils\Logger\ContainerLogger.cs" />
     <Compile Include="Utils\Injector\AutoInjector.cs" />
     <Compile Include="Utils\Tickets\TicketEntry.cs" />
@@ -1778,6 +1779,12 @@
     </Compile>
     <Compile Include="View\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\Parametrage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\Parametrage.Designer.cs">
+      <DependentUpon>Parametrage.cs</DependentUpon>
     </Compile>
     <Compile Include="View\PathForm.cs">
       <SubType>Form</SubType>
@@ -1803,6 +1810,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\Parametrage.resx">
+      <DependentUpon>Parametrage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\PathForm.resx">
       <DependentUpon>PathForm.cs</DependentUpon>
@@ -3340,6 +3350,7 @@
     <Content Include="Protocol\Types_Xml\secure\TrustCertificate.xml" />
     <Content Include="Protocol\Types_Xml\version\Version.xml" />
     <Content Include="Protocol\Types_Xml\web\haapi\BufferInformation.xml" />
+    <Content Include="Ressources\logo.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AmaknaProxy.Hooks\AmaknaProxy.Hooks.csproj">
