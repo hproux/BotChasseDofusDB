@@ -6,9 +6,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
+using static AmaknaProxy.Sniffer.Bot.Chasse;
+using MapPositions = AmaknaProxy.Sniffer.Bot.Chasse.MapPositions;
 
 namespace AmaknaProxy.Sniffer.Bot
 {
+    public class ChasseDetail
+    {
+        public MapPositions? currentStartMap; // Contient la map de depart de l'indice courant
+        public string direction;
+        public typeIndiceEnum? typeIndice;
+        public uint? idIndice; // Si type == phorreur -> id phorreur sinon id de l'indice
+    }
+
     public class Chasse
     {
         #region Structures
@@ -24,23 +35,28 @@ namespace AmaknaProxy.Sniffer.Bot
             public uint id;
             public string label;
         }
+        #endregion
 
+        #region enums
+        public enum typeIndiceEnum
+        {
+            PHORREUR,
+            INDICE
+        }
         #endregion
 
         public bool isActive { get; set; }
-        public double currentStartMapId { get; set; }
-        public MapPositions startMap { get; set; } // Contient la map de départ de l'indice courant
         public List<MapPositions> gListeMapsPositions { get; set; } // correspondances mapId -> Coordonées X/Y
-
         public List<PointOfInterestLabel> gListeLabelPOI { get; set; } // Contient les libellé de chaque POI
-
-        public uint? idPhorreurToFind { get; set; } // Si renseigné, on recherche actuellement un phorreur
+        public ChasseDetail gChasseEnCours { get; set; } // Contient le detail de la chasse en cours
+        public hintFinder.hintFinder gObjHintFinder { get; set; }
 
         // Constructeur
         public Chasse()
         {
             isActive = true; // TODO -> Gérer le booleen via une checkbox
-            idPhorreurToFind = null;
+
+            gChasseEnCours = null;
 
             // ** Chargement des fichiers JSON **
             // Chargement des correspondances mapId -> Coordonées X/Y
@@ -62,6 +78,9 @@ namespace AmaknaProxy.Sniffer.Bot
                 string json = r.ReadToEnd();
                 gListeLabelPOI = JsonConvert.DeserializeObject<List<PointOfInterestLabel>>(json);//Contient tous les indices de chasses (POI) id + libelle
             }
+
+            // Init hint finder
+           gObjHintFinder = new hintFinder.hintFinder();
 
             WindowManager.MainWindow.Logger.Info(gListeLabelPOI.Count() + " indices trouvés");
         }
@@ -108,17 +127,18 @@ namespace AmaknaProxy.Sniffer.Bot
 
                     WindowManager.MainWindow.Logger.Info("Changement de map -> id: " + pObjCurrentMap.mapId + ", X: " + currentPosXY.posX + ", Y:" + currentPosXY.posY);
                     
-                    if (startMap.id != 0)
+                    if (gChasseEnCours != null && gChasseEnCours.currentStartMap != null)
                     {
-                        if (startMap.id == currentPosXY.id)
+                        if (gChasseEnCours.currentStartMap.Value.id == currentPosXY.id)
                         {
                             WindowManager.MainWindow.Logger.Info("Position de départ de l'indice");
                             // TODO -> Demarrage de la chasse
+                            goToHint();
                         }
 
-                        if (idPhorreurToFind != null)
+                        if (gChasseEnCours != null && gChasseEnCours.typeIndice == typeIndiceEnum.PHORREUR && gChasseEnCours.idIndice != null)
                         {
-                            if(isPhorreurOnMap(idPhorreurToFind.Value, pObjCurrentMap.actors) == true)
+                            if(isPhorreurOnMap(gChasseEnCours.idIndice.Value, pObjCurrentMap.actors) == true)
                             {
                                 WindowManager.MainWindow.Logger.Info("Phorreur trouvé");
                                 // TODO Cliquer sur le jalon
@@ -138,8 +158,7 @@ namespace AmaknaProxy.Sniffer.Bot
         // Evenement de reception d'une tramme de chasse 
         public void eventChasse(TreasureHuntMessage pEventChasse)
         {
-            startMap = new MapPositions();
-            idPhorreurToFind = null;
+            gChasseEnCours = null;
 
             try {
                 if (isActive)
@@ -154,39 +173,35 @@ namespace AmaknaProxy.Sniffer.Bot
                         {
                             TreasureHuntStep currentStep = pEventChasse.knownStepsList[nbCurrentFlag];
 
-                            string labelId = "";
-                            string direction = "";
+                            gChasseEnCours = new ChasseDetail();
 
                             if (currentStep.TypeId == TreasureHuntStepFollowDirectionToHint.Id) // Cas phorreurs
                             {
                                 TreasureHuntStepFollowDirectionToHint directionToHint = (TreasureHuntStepFollowDirectionToHint)currentStep;
-                                labelId = directionToHint.npcId.ToString() + " (Hint)";
-                                idPhorreurToFind = directionToHint.npcId; // On indique qu'on recherche un phorreur
-                                direction = directionToHint.direction.ToString();
 
+                                gChasseEnCours.typeIndice = typeIndiceEnum.PHORREUR;
+                                gChasseEnCours.idIndice = directionToHint.npcId;
+                                gChasseEnCours.direction = directionToHint.direction.ToString();
                             }
                             else if (currentStep.TypeId == TreasureHuntStepFollowDirectionToPOI.Id)
                             {
                                 TreasureHuntStepFollowDirectionToPOI directionToPOI = (TreasureHuntStepFollowDirectionToPOI)currentStep;
-                                labelId = directionToPOI.poiLabelId.ToString() + " (POI: " + getLibelleIndiceFromPoiId(directionToPOI.poiLabelId) + ")";
-                                direction = directionToPOI.direction.ToString();
+
+                                gChasseEnCours.typeIndice = typeIndiceEnum.INDICE;
+                                gChasseEnCours.idIndice = directionToPOI.poiLabelId;
+                                gChasseEnCours.direction = directionToPOI.direction.ToString();
                             }
-
-
-                            MapPositions objPos;
 
                             if (pEventChasse.flags.Count() > 0) // Si des flags on déjà été posés on récupère la derniere pos
                             {
-                                objPos = getPosFromMapId(pEventChasse.flags.Last().mapId);
+                                gChasseEnCours.currentStartMap = getPosFromMapId(pEventChasse.flags.Last().mapId);
                             }
                             else // Position de start de la chasse
                             {
-                                objPos = getPosFromMapId(pEventChasse.startMapId);
+                                gChasseEnCours.currentStartMap = getPosFromMapId(pEventChasse.startMapId);
                             }
 
-                            startMap = objPos;
-
-                            WindowManager.MainWindow.Logger.Info("TreasureHuntMessage, map X: " + objPos.posX + ", map Y: " + objPos.posY + ", flags posés: " + nbCurrentFlag + ", Indice ID: " + labelId + ", direction: " + direction);
+                            WindowManager.MainWindow.Logger.Info("TreasureHuntMessage, map X: " + gChasseEnCours.currentStartMap.Value.posX + ", map Y: " + gChasseEnCours.currentStartMap.Value.posY + ", flags posés: " + nbCurrentFlag + ", Indice ID: " + gChasseEnCours.idIndice + ", direction: " + gChasseEnCours.direction);
 
                         }
                         else
@@ -205,6 +220,72 @@ namespace AmaknaProxy.Sniffer.Bot
             {
                 WindowManager.MainWindow.Logger.Error("eventChasse: " + ex.Message);
             }
+        }
+
+        public void goToHint()
+        {
+            if (gChasseEnCours != null)
+            {
+                if (gChasseEnCours.typeIndice == typeIndiceEnum.INDICE)
+                {
+
+                    string libelleIndice = getLibelleIndiceFromPoiId(gChasseEnCours.idIndice.Value);
+                    int hintFinderIndiceId = gObjHintFinder.mapLabelToClueId(libelleIndice);
+
+                    string startPosX = gChasseEnCours.currentStartMap.Value.posX;
+                    string startPosY = gChasseEnCours.currentStartMap.Value.posY;
+
+                    if (String.IsNullOrWhiteSpace(startPosX) || String.IsNullOrWhiteSpace(startPosY))
+                    {
+                        WindowManager.MainWindow.Logger.Error("Erreur: Position inconnue");
+                    }
+
+                    hintFinder.hintFinder.Directions objDirection;
+
+                    switch (gChasseEnCours.direction)
+                    {
+                        case "0":
+                            objDirection = hintFinder.hintFinder.Directions.Droite;
+                            break;
+
+                        case "2":
+                            objDirection = hintFinder.hintFinder.Directions.Bas;
+                            break;
+
+                        case "4":
+                            objDirection = hintFinder.hintFinder.Directions.Gauche;
+                            break;
+
+                        case "6":
+                            objDirection = hintFinder.hintFinder.Directions.Haut;
+                            break;
+                        default:
+                            WindowManager.MainWindow.Logger.Error("Erreur: Direction inconnue");
+                            return;
+                    }
+
+                    hintFinder.hintFinder.HintMap objPosIndice = gObjHintFinder.searchFromId(hintFinderIndiceId, int.Parse(startPosX), int.Parse(startPosY), objDirection); // Récuperationb de la position de l'indice
+
+                    string travelCommand = "Indice trouvé: /travel " + objPosIndice.x + " " + objPosIndice.y;
+                    Clipboard.SetText(travelCommand);
+                }
+                else if (gChasseEnCours.typeIndice == typeIndiceEnum.PHORREUR)
+                {
+                    // TODO
+                } 
+                else
+                {
+                    WindowManager.MainWindow.Logger.Error("Erreur: Type d'indice inconnu");
+                }
+            } else
+            {
+                WindowManager.MainWindow.Logger.Error("Erreur: Chasse en cours inconnue");
+            }
+        }
+
+        public void doTravelToPosition(int posX, int posY)
+        {
+            // TODO
         }
     }
 }
