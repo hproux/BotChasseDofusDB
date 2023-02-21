@@ -49,7 +49,7 @@ namespace AmaknaProxy.Sniffer.Bot
         public List<MapPositions> gListeMapsPositions { get; set; } // correspondances mapId -> Coordonées X/Y
         public List<PointOfInterestLabel> gListeLabelPOI { get; set; } // Contient les libellé de chaque POI
         public ChasseDetail gChasseEnCours { get; set; } // Contient le detail de la chasse en cours
-        public hintFinder.hintFinder gObjHintFinder { get; set; }
+        public hintFinder gObjHintFinder { get; set; }
 
         // Constructeur
         public Chasse()
@@ -80,7 +80,7 @@ namespace AmaknaProxy.Sniffer.Bot
             }
 
             // Init hint finder
-           gObjHintFinder = new hintFinder.hintFinder();
+           gObjHintFinder = new hintFinder();
 
             WindowManager.MainWindow.Logger.Info(gListeLabelPOI.Count() + " indices trouvés");
         }
@@ -145,9 +145,7 @@ namespace AmaknaProxy.Sniffer.Bot
                             }
                         }
                     }
-
                 }
-
             } 
             catch (Exception ex)
             {
@@ -202,7 +200,7 @@ namespace AmaknaProxy.Sniffer.Bot
                             }
 
                             WindowManager.MainWindow.Logger.Info("TreasureHuntMessage, map X: " + gChasseEnCours.currentStartMap.Value.posX + ", map Y: " + gChasseEnCours.currentStartMap.Value.posY + ", flags posés: " + nbCurrentFlag + ", Indice ID: " + gChasseEnCours.idIndice + ", direction: " + gChasseEnCours.direction);
-
+                            // TODO trouver a quel moment declencher le goToHint(); (le changement de map est fait plus tot -> si position actu = position current startMap alors faire goToHint();)
                         }
                         else
                         {
@@ -240,34 +238,35 @@ namespace AmaknaProxy.Sniffer.Bot
                         WindowManager.MainWindow.Logger.Error("Erreur: Position inconnue");
                     }
 
-                    hintFinder.hintFinder.Directions objDirection;
+                    hintFinder.Directions objDirection;
 
                     switch (gChasseEnCours.direction)
                     {
                         case "0":
-                            objDirection = hintFinder.hintFinder.Directions.Droite;
+                            objDirection = hintFinder.Directions.Droite;
                             break;
 
                         case "2":
-                            objDirection = hintFinder.hintFinder.Directions.Bas;
+                            objDirection = hintFinder.Directions.Bas;
                             break;
 
                         case "4":
-                            objDirection = hintFinder.hintFinder.Directions.Gauche;
+                            objDirection = hintFinder.Directions.Gauche;
                             break;
 
                         case "6":
-                            objDirection = hintFinder.hintFinder.Directions.Haut;
+                            objDirection = hintFinder.Directions.Haut;
                             break;
                         default:
                             WindowManager.MainWindow.Logger.Error("Erreur: Direction inconnue");
                             return;
                     }
 
-                    hintFinder.hintFinder.HintMap objPosIndice = gObjHintFinder.searchFromId(hintFinderIndiceId, int.Parse(startPosX), int.Parse(startPosY), objDirection); // Récuperationb de la position de l'indice
+                    hintFinder.HintMap objPosIndice = gObjHintFinder.searchFromId(hintFinderIndiceId, int.Parse(startPosX), int.Parse(startPosY), objDirection); // Récuperationb de la position de l'indice
 
                     string travelCommand = "Indice trouvé: /travel " + objPosIndice.x + " " + objPosIndice.y;
-                    Clipboard.SetText(travelCommand);
+                    WindowManager.MainWindow.Logger.Info(travelCommand);
+                    //Clipboard.SetText(travelCommand); -> Erreur de thread
                 }
                 else if (gChasseEnCours.typeIndice == typeIndiceEnum.PHORREUR)
                 {
