@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using static AmaknaProxy.Sniffer.Bot.Chasse;
 using MapPositions = AmaknaProxy.Sniffer.Bot.Chasse.MapPositions;
@@ -50,6 +51,7 @@ namespace AmaknaProxy.Sniffer.Bot
         public List<PointOfInterestLabel> gListeLabelPOI { get; set; } // Contient les libellé de chaque POI
         public ChasseDetail gChasseEnCours { get; set; } // Contient le detail de la chasse en cours
         public hintFinder gObjHintFinder { get; set; }
+        public MapPositions currentPlayerPosition { get; set; }
 
         // Constructeur
         public Chasse()
@@ -123,13 +125,13 @@ namespace AmaknaProxy.Sniffer.Bot
             {
                 if(isActive)
                 {
-                    MapPositions currentPosXY = getPosFromMapId(pObjCurrentMap.mapId);
+                    currentPlayerPosition = getPosFromMapId(pObjCurrentMap.mapId);
 
-                    WindowManager.MainWindow.Logger.Info("Changement de map -> id: " + pObjCurrentMap.mapId + ", X: " + currentPosXY.posX + ", Y:" + currentPosXY.posY);
+                    WindowManager.MainWindow.Logger.Info("Changement de map -> id: " + pObjCurrentMap.mapId + ", X: " + currentPlayerPosition.posX + ", Y:" + currentPlayerPosition.posY);
                     
                     if (gChasseEnCours != null && gChasseEnCours.currentStartMap != null)
                     {
-                        if (gChasseEnCours.currentStartMap.Value.id == currentPosXY.id)
+                        if (gChasseEnCours.currentStartMap.Value.id == currentPlayerPosition.id)
                         {
                             WindowManager.MainWindow.Logger.Info("Position de départ de l'indice");
                             // TODO -> Demarrage de la chasse
@@ -199,8 +201,12 @@ namespace AmaknaProxy.Sniffer.Bot
                                 gChasseEnCours.currentStartMap = getPosFromMapId(pEventChasse.startMapId);
                             }
 
-                            WindowManager.MainWindow.Logger.Info("TreasureHuntMessage, map X: " + gChasseEnCours.currentStartMap.Value.posX + ", map Y: " + gChasseEnCours.currentStartMap.Value.posY + ", flags posés: " + nbCurrentFlag + ", Indice ID: " + gChasseEnCours.idIndice + ", direction: " + gChasseEnCours.direction);
-                            // TODO trouver a quel moment declencher le goToHint(); (le changement de map est fait plus tot -> si position actu = position current startMap alors faire goToHint();)
+                            // WindowManager.MainWindow.Logger.Info("TreasureHuntMessage, map X: " + gChasseEnCours.currentStartMap.Value.posX + ", map Y: " + gChasseEnCours.currentStartMap.Value.posY + ", flags posés: " + nbCurrentFlag + ", Indice ID: " + gChasseEnCours.idIndice + ", direction: " + gChasseEnCours.direction);
+                            // Si le joueur est sur la case de départ de l'indice on le déplace au nouvel indice
+                            if (currentPlayerPosition.id == gChasseEnCours.currentStartMap.Value.id)
+                            {
+                                goToHint();
+                            }
                         }
                         else
                         {
@@ -264,9 +270,9 @@ namespace AmaknaProxy.Sniffer.Bot
 
                     hintFinder.HintMap objPosIndice = gObjHintFinder.searchFromId(hintFinderIndiceId, int.Parse(startPosX), int.Parse(startPosY), objDirection); // Récuperationb de la position de l'indice
 
-                    string travelCommand = "Indice trouvé: /travel " + objPosIndice.x + " " + objPosIndice.y;
-                    WindowManager.MainWindow.Logger.Info(travelCommand);
-                    //Clipboard.SetText(travelCommand); -> Erreur de thread
+                    string travelCommand = "/travel " + objPosIndice.x + " " + objPosIndice.y;
+                    WindowManager.MainWindow.Logger.Info("Indice trouvé, commande copiée: " + travelCommand);
+                    copyToClipboard(travelCommand);
                 }
                 else if (gChasseEnCours.typeIndice == typeIndiceEnum.PHORREUR)
                 {
@@ -285,6 +291,14 @@ namespace AmaknaProxy.Sniffer.Bot
         public void doTravelToPosition(int posX, int posY)
         {
             // TODO
+        }
+
+        public void copyToClipboard(string command)
+        {
+            Thread thread = new Thread(() => Clipboard.SetText(command));
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
         }
     }
 }
