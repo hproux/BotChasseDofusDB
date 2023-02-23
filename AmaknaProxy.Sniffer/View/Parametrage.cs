@@ -17,6 +17,9 @@ namespace AmaknaProxy.Sniffer.View
         public Parametrage()
         {
             InitializeComponent();
+
+            // TODO Dans la classe, ajouter une fonction qui récupère tous les points et modifier les libellés en fonction
+            //InteractionsUI.
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -52,6 +55,14 @@ namespace AmaknaProxy.Sniffer.View
         {
             Point pt = InteractionsUI.GetCursorPos();
             InteractionsUI.savePointCurseurRegistre(pt, InteractionsUI.ptDroite);
+
+            input_directionDroite.Text = "OK";
+        }
+
+        private void input_premierDrapeau_KeyUp(object sender, KeyEventArgs e)
+        {
+            Point pt = InteractionsUI.GetCursorPos();
+            InteractionsUI.savePointCurseurRegistre(pt, InteractionsUI.ptDrapeau);
 
             input_directionDroite.Text = "OK";
         }

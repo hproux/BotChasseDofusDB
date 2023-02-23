@@ -80,8 +80,6 @@ namespace AmaknaProxy.Engine.View
             // CheckBox_Enable
             // 
             this.CheckBox_Enable.AutoSize = true;
-            this.CheckBox_Enable.Checked = true;
-            this.CheckBox_Enable.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CheckBox_Enable.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.CheckBox_Enable.Location = new System.Drawing.Point(3, 484);
             this.CheckBox_Enable.Name = "CheckBox_Enable";
@@ -97,7 +95,11 @@ namespace AmaknaProxy.Engine.View
             this.DataGridView_PacketsList.AllowUserToResizeColumns = false;
             this.DataGridView_PacketsList.AllowUserToResizeRows = false;
             this.DataGridView_PacketsList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.DataGridView_PacketsList.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { this.Column_Hour, this.Column_Origin, this.Column_ID, this.Column_Name });
+            this.DataGridView_PacketsList.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column_Hour,
+            this.Column_Origin,
+            this.Column_ID,
+            this.Column_Name});
             this.DataGridView_PacketsList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DataGridView_PacketsList.Location = new System.Drawing.Point(3, 18);
             this.DataGridView_PacketsList.MultiSelect = false;
@@ -151,7 +153,7 @@ namespace AmaknaProxy.Engine.View
             this.Button_Clean.Name = "Button_Clean";
             this.Button_Clean.Size = new System.Drawing.Size(331, 24);
             this.Button_Clean.TabIndex = 1;
-            this.Button_Clean.Text = "Voir l'historique";
+            this.Button_Clean.Text = "Voir l\'historique";
             this.Button_Clean.UseVisualStyleBackColor = true;
             this.Button_Clean.Click += new System.EventHandler(this.Button_Clean_Click);
             // 
@@ -209,6 +211,7 @@ namespace AmaknaProxy.Engine.View
             this.splitContainer1.ResumeLayout(false);
             this.GroupBox_Details.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
 
         internal System.Windows.Forms.Button button1;

@@ -39,6 +39,9 @@
             this.input_directionBas = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.input_directionGauche = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.input_premierDrapeau = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // input_directionHaut
@@ -150,11 +153,46 @@
             this.input_directionGauche.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.input_directionGauche.KeyUp += new System.Windows.Forms.KeyEventHandler(this.input_directionGauche_KeyUp);
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(12, 230);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(195, 24);
+            this.label7.TabIndex = 10;
+            this.label7.Text = "Gestion des drapeaux";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.Location = new System.Drawing.Point(42, 259);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(108, 16);
+            this.label8.TabIndex = 12;
+            this.label8.Text = "Premier drapeau";
+            // 
+            // input_premierDrapeau
+            // 
+            this.input_premierDrapeau.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.input_premierDrapeau.Location = new System.Drawing.Point(45, 278);
+            this.input_premierDrapeau.Name = "input_premierDrapeau";
+            this.input_premierDrapeau.ReadOnly = true;
+            this.input_premierDrapeau.Size = new System.Drawing.Size(101, 29);
+            this.input_premierDrapeau.TabIndex = 11;
+            this.input_premierDrapeau.Text = "Non défini";
+            this.input_premierDrapeau.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.input_premierDrapeau.KeyUp += new System.Windows.Forms.KeyEventHandler(this.input_premierDrapeau_KeyUp);
+            // 
             // Parametrage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.input_premierDrapeau);
+            this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.input_directionGauche);
             this.Controls.Add(this.label5);
@@ -191,5 +229,8 @@
         private System.Windows.Forms.TextBox input_directionBas;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox input_directionGauche;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox input_premierDrapeau;
     }
 }

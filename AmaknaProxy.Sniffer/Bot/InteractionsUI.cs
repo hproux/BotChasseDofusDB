@@ -24,6 +24,7 @@ namespace AmaknaProxy.Sniffer.Bot
         public const string ptDroite = "ptDroite";
         public const string ptBas = "ptBas";
         public const string ptGauche = "ptGauche";
+        public const string ptDrapeau = "ptDrapeau";
 
         public struct userSettings
         {

@@ -269,10 +269,8 @@ namespace AmaknaProxy.Sniffer.Bot
                     }
 
                     hintFinder.HintMap objPosIndice = gObjHintFinder.searchFromId(hintFinderIndiceId, int.Parse(startPosX), int.Parse(startPosY), objDirection); // Récuperationb de la position de l'indice
-
-                    string travelCommand = "/travel " + objPosIndice.x + " " + objPosIndice.y;
-                    WindowManager.MainWindow.Logger.Info("Indice trouvé, commande copiée: " + travelCommand);
-                    copyToClipboard(travelCommand);
+                                        
+                    doTravelToPosition(objPosIndice.x, objPosIndice.y);
                 }
                 else if (gChasseEnCours.typeIndice == typeIndiceEnum.PHORREUR)
                 {
@@ -290,7 +288,23 @@ namespace AmaknaProxy.Sniffer.Bot
 
         public void doTravelToPosition(int posX, int posY)
         {
-            // TODO
+            string travelCommand = "/travel " + posX + " " + posY;
+
+            WindowManager.MainWindow.Logger.Info("Indice trouvé, commande copiée: " + travelCommand);
+            copyToClipboard(travelCommand);
+
+            Thread thread = new Thread(() => {
+                Thread.Sleep(500);
+                SendKeys.SendWait("^{ENTER}"); //Control + Entree -> Entre en ecriture dans le chat
+                Thread.Sleep(100);
+                SendKeys.SendWait("^{v}"); //Control + V -> Copie le travel
+                Thread.Sleep(100);
+                SendKeys.SendWait("{ENTER}"); //Enter -> Envoi la commande travel
+                Thread.Sleep(400);
+                SendKeys.SendWait("{ENTER}"); //Enter -> Valide le travel
+            });
+
+            thread.Start();
         }
 
         public void copyToClipboard(string command)

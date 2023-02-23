@@ -99,18 +99,16 @@ namespace AmaknaProxy.Sniffer.Bot
                     hintFound = maps.OrderBy(map => map.x).FirstOrDefault();
                     break;
                 case Directions.Bas:
-                    hintFound = maps.OrderBy(map => map.y).LastOrDefault();
+                    hintFound = maps.OrderBy(map => map.y).FirstOrDefault();
                     break;
                 case Directions.Gauche:
                     hintFound = maps.OrderBy(map => map.x).LastOrDefault();
                     break;
 
                 case Directions.Haut:
-                    hintFound = maps.OrderBy(map => map.x).FirstOrDefault();
+                    hintFound = maps.OrderBy(map => map.y).LastOrDefault();
                     break;
             }
-
-            //Console.WriteLine(hintFound.x + ' ' + hintFound.y);
 
             return hintFound;
 
