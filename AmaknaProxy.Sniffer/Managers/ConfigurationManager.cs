@@ -97,7 +97,7 @@ namespace AmaknaProxy.Engine.Managers
                 }
                 catch (Exception ex)
                 {
-                    WindowManager.MainWindow.Logger.Error("Error de lectura de archivo -> " + ex.Message);
+                    WindowManager.MainWindow.Logger.Error("Erreur d'ecriture dans le fichier -> " + ex.Message);
                     return false;
                 }
             }
@@ -123,7 +123,7 @@ namespace AmaknaProxy.Engine.Managers
                 }
                 catch (Exception ex)
                 {
-                    WindowManager.MainWindow.Logger.Error("Error de escritura de archivo -> " + ex.Message);
+                    WindowManager.MainWindow.Logger.Error("Erreur d'ecriture dans le fichier -> " + ex.Message);
                     return false;
                 }
             }

@@ -58,7 +58,7 @@ namespace AmaknaProxy.Engine.View
             f.Text = "Console";
             f.Controls.Add(Container);
             f.CloseButtonVisible = false;
-            f.Show(DockPanel_Main, DockState.DockBottom);
+            f.Show(DockPanel_Main, DockState.Document);
         }
 
         private void LoadInjector()
