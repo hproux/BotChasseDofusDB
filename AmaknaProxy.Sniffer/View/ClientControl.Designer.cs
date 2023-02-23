@@ -81,12 +81,12 @@ namespace AmaknaProxy.Engine.View
             // 
             this.CheckBox_Enable.AutoSize = true;
             this.CheckBox_Enable.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.CheckBox_Enable.Enabled = false;
+            this.CheckBox_Enable.Enabled = true;
             this.CheckBox_Enable.Location = new System.Drawing.Point(3, 484);
             this.CheckBox_Enable.Name = "CheckBox_Enable";
             this.CheckBox_Enable.Size = new System.Drawing.Size(331, 17);
             this.CheckBox_Enable.TabIndex = 3;
-            this.CheckBox_Enable.Text = "Activé";
+            this.CheckBox_Enable.Text = "Activer";
             this.CheckBox_Enable.UseVisualStyleBackColor = true;
             // 
             // DataGridView_PacketsList
