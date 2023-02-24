@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "DofusBot"
-#define MyAppVersion "2.66.10"
+#define MyAppVersion "2.66.10.1"
 #define MyAppExeName "AmaknaProxy.Sniffer.exe"
 
 [Setup]
@@ -17,7 +17,7 @@ DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
-OutputBaseFilename=Setup_DofusBot_2.66.10
+OutputBaseFilename=Setup_DofusBot_2.66.10.1
 SetupIconFile=D:\Documents\batch\ProjetsC#\BotMITM\VersionDofusDB\AmaknaCoreSniffer\AmaknaCore-Sniffer-master\AmaknaProxy.Sniffer\Ressources\logoBot.ico
 Compression=lzma
 SolidCompression=yes
