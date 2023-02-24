@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -51,7 +52,8 @@ namespace AmaknaProxy.Sniffer.Bot
 
         public int mapLabelToClueId(string label)
         {
-            MapPositions currentHint = IdandLabelList.Find(mapping => label.Equals(mapping.hintfr, StringComparison.CurrentCultureIgnoreCase));
+            //
+            MapPositions currentHint = IdandLabelList.Find(mapping => String.Compare(label, mapping.hintfr, CultureInfo.CurrentCulture, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) == 0);
             return currentHint.clueid;
         }
 

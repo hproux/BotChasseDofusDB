@@ -18,8 +18,13 @@ namespace AmaknaProxy.Sniffer.View
         {
             InitializeComponent();
 
-            // TODO Dans la classe, ajouter une fonction qui récupère tous les points et modifier les libellés en fonction
-            //InteractionsUI.
+            InteractionsUI.userSettings? objSettings =  InteractionsUI.getUserCurseursRegistre();
+
+            if (objSettings != null)
+            {
+                input_premierDrapeau.Text = "OK";
+                input_pointMilieu.Text = "OK";
+            }
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -27,44 +32,20 @@ namespace AmaknaProxy.Sniffer.View
 
         }
 
-        private void input_directionHaut_KeyUp(object sender, KeyEventArgs e)
-        {
-            Point pt = InteractionsUI.GetCursorPos();
-            InteractionsUI.savePointCurseurRegistre(pt, InteractionsUI.ptHaut);
-
-            input_directionHaut.Text = "OK";
-        }
-
-        private void input_directionGauche_KeyUp(object sender, KeyEventArgs e)
-        {
-            Point pt = InteractionsUI.GetCursorPos();
-            InteractionsUI.savePointCurseurRegistre(pt, InteractionsUI.ptGauche);
-
-            input_directionGauche.Text = "OK";
-        }
-
-        private void input_directionBas_KeyUp(object sender, KeyEventArgs e)
-        {
-            Point pt = InteractionsUI.GetCursorPos();
-            InteractionsUI.savePointCurseurRegistre(pt, InteractionsUI.ptBas);
-
-            input_directionBas.Text = "OK";
-        }
-
-        private void input_directionDroite_KeyUp(object sender, KeyEventArgs e)
-        {
-            Point pt = InteractionsUI.GetCursorPos();
-            InteractionsUI.savePointCurseurRegistre(pt, InteractionsUI.ptDroite);
-
-            input_directionDroite.Text = "OK";
-        }
-
         private void input_premierDrapeau_KeyUp(object sender, KeyEventArgs e)
         {
             Point pt = InteractionsUI.GetCursorPos();
             InteractionsUI.savePointCurseurRegistre(pt, InteractionsUI.ptDrapeau);
 
-            input_directionDroite.Text = "OK";
+            input_premierDrapeau.Text = "OK";
+        }
+
+        private void input_milieuEcran_KeyUp(object sender, KeyEventArgs e)
+        {
+            Point pt = InteractionsUI.GetCursorPos();
+            InteractionsUI.savePointCurseurRegistre(pt, InteractionsUI.ptMilieu);
+
+            input_pointMilieu.Text = "OK";
         }
     }
 }

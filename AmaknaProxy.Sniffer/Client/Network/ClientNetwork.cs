@@ -291,7 +291,7 @@ namespace AmaknaProxy.Engine.Client.Network
 
         private void SaveMsg(NetworkMessage msg, ConnectionDestination destination)
         {
-            if (Client.Silent)
+            if (true) //TODO Pour log dans le fichier mettre : Client.Silent
                 return;
 
             try

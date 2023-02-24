@@ -20,18 +20,12 @@ namespace AmaknaProxy.Sniffer.Bot
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
         private const int MOUSEEVENTF_LEFTUP = 0x04;
 
-        public const string ptHaut = "ptHaut";
-        public const string ptDroite = "ptDroite";
-        public const string ptBas = "ptBas";
-        public const string ptGauche = "ptGauche";
+        public const string ptMilieu = "ptMilieu";
         public const string ptDrapeau = "ptDrapeau";
 
         public struct userSettings
         {
-            public Point deplacementHaut;
-            public Point deplacementDroite;
-            public Point deplacementBas;
-            public Point deplacementGauche;
+            public Point pointMilieu;
             public Point drapeau1;
         }
 
@@ -43,7 +37,7 @@ namespace AmaknaProxy.Sniffer.Bot
             return pt;
         }
 
-        public static void SetCursorPos(int X, int Y)
+        private static void SetCursorPos(int X, int Y)
         {
             Point pt = new Point();
             pt.X = X;
@@ -51,7 +45,7 @@ namespace AmaknaProxy.Sniffer.Bot
             Cursor.Position = pt;
         }
 
-        public static void LeftClick()
+        private static void LeftClick()
         {
             //perform click            
             mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
@@ -74,6 +68,76 @@ namespace AmaknaProxy.Sniffer.Bot
             keyRegister.SetValue(idCurseur + "Y", pt.Y);
 
             WindowManager.MainWindow.Logger.Info("Point " + idCurseur + " défini en X:" + pt.X + ", Y: " + pt.Y);
+        }
+
+        public static userSettings? getUserCurseursRegistre()
+        {
+            userSettings? objUserSettings = null;
+
+            Microsoft.Win32.RegistryKey keyRegister = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("BotChasse", true);
+
+            if (keyRegister != null)
+            {
+                try
+                {
+                    objUserSettings = new userSettings() { 
+                        pointMilieu = new Point(Int32.Parse(keyRegister.GetValue(ptMilieu + "X").ToString()), Int32.Parse(keyRegister.GetValue(ptMilieu + "Y").ToString())),
+                        drapeau1 = new Point(Int32.Parse(keyRegister.GetValue(ptDrapeau + "X").ToString()), Int32.Parse(keyRegister.GetValue(ptDrapeau + "Y").ToString()))
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    objUserSettings = null;
+                    WindowManager.MainWindow.Logger.Error("Configuration incomplète, veuillez définir les points dans l'onglet configuration puis redémarrer votre jeu");
+                }
+
+            }
+
+            return objUserSettings;
+        }
+        
+        /// <summary>
+        /// Effectue un clic à la position donnée
+        /// </summary>
+        /// <param name="idCurseur"></param>
+        public static void SimpleClickToPoint(Point pointToClick)
+        {
+            Thread thread = new Thread(() => {
+                Thread.Sleep(200);
+                SetCursorPos(pointToClick.X, pointToClick.Y);
+                LeftClick();
+            });
+
+            thread.Start();
+        }
+
+        public static void doTravelToPosition(int posX, int posY)
+        {
+            string travelCommand = "/travel " + posX + " " + posY;
+
+            copyToClipboard(travelCommand);
+
+            Thread thread = new Thread(() => {
+                Thread.Sleep(500);
+                SendKeys.SendWait("^{ENTER}"); //Control + Entree -> Entre en ecriture dans le chat
+                Thread.Sleep(100);
+                SendKeys.SendWait("^{v}"); //Control + V -> Copie le travel
+                Thread.Sleep(100);
+                SendKeys.SendWait("{ENTER}"); //Enter -> Envoi la commande travel
+                Thread.Sleep(400);
+                SendKeys.SendWait("{ENTER}"); //Enter -> Valide le travel
+            });
+
+            thread.Start();
+        }
+
+        public static void copyToClipboard(string command)
+        {
+            Thread thread = new Thread(() => Clipboard.SetText(command));
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
         }
     }
 }

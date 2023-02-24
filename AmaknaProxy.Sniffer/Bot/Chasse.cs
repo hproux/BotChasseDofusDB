@@ -4,10 +4,10 @@ using AmaknaProxy.API.Protocol.Types;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Windows.Forms;
 using static AmaknaProxy.Sniffer.Bot.Chasse;
 using MapPositions = AmaknaProxy.Sniffer.Bot.Chasse.MapPositions;
 
@@ -19,6 +19,8 @@ namespace AmaknaProxy.Sniffer.Bot
         public string direction;
         public typeIndiceEnum? typeIndice;
         public uint? idIndice; // Si type == phorreur -> id phorreur sinon id de l'indice
+        public int nbCurrentFlag;
+        public hintFinder.HintMap? positionIndice { get; set; }
     }
 
     public class Chasse
@@ -46,18 +48,21 @@ namespace AmaknaProxy.Sniffer.Bot
         }
         #endregion
 
-        public bool isActive { get; set; }
+        public bool gIsActive { get; set; } // Si false, le bot chasse ne sera pas actif
+        public InteractionsUI.userSettings? gUserSettings { get; set; }
         public List<MapPositions> gListeMapsPositions { get; set; } // correspondances mapId -> Coordonées X/Y
         public List<PointOfInterestLabel> gListeLabelPOI { get; set; } // Contient les libellé de chaque POI
         public ChasseDetail gChasseEnCours { get; set; } // Contient le detail de la chasse en cours
         public hintFinder gObjHintFinder { get; set; }
-        public MapPositions currentPlayerPosition { get; set; }
+        public MapPositions gCurrentPlayerPosition { get; set; }
 
         // Constructeur
         public Chasse()
         {
-            isActive = true; // TODO -> Gérer le booleen via une checkbox
+            // Chargement du parametrage utilisateur
+            gUserSettings = InteractionsUI.getUserCurseursRegistre();
 
+            gIsActive = gUserSettings == null ? false : true;
             gChasseEnCours = null;
 
             // ** Chargement des fichiers JSON **
@@ -123,27 +128,31 @@ namespace AmaknaProxy.Sniffer.Bot
         {
             try
             {
-                if(isActive)
+                if(gIsActive)
                 {
-                    currentPlayerPosition = getPosFromMapId(pObjCurrentMap.mapId);
-
-                    WindowManager.MainWindow.Logger.Info("Changement de map -> id: " + pObjCurrentMap.mapId + ", X: " + currentPlayerPosition.posX + ", Y:" + currentPlayerPosition.posY);
+                    gCurrentPlayerPosition = getPosFromMapId(pObjCurrentMap.mapId);
                     
                     if (gChasseEnCours != null && gChasseEnCours.currentStartMap != null)
                     {
-                        if (gChasseEnCours.currentStartMap.Value.id == currentPlayerPosition.id)
+                        if (gChasseEnCours.currentStartMap.Value.id == gCurrentPlayerPosition.id)
                         {
                             WindowManager.MainWindow.Logger.Info("Position de départ de l'indice");
-                            // TODO -> Demarrage de la chasse
                             goToHint();
                         }
-
-                        if (gChasseEnCours != null && gChasseEnCours.typeIndice == typeIndiceEnum.PHORREUR && gChasseEnCours.idIndice != null)
+                        else if (gChasseEnCours != null && gChasseEnCours.typeIndice == typeIndiceEnum.PHORREUR && gChasseEnCours.idIndice != null)
                         {
                             if(isPhorreurOnMap(gChasseEnCours.idIndice.Value, pObjCurrentMap.actors) == true)
                             {
                                 WindowManager.MainWindow.Logger.Info("Phorreur trouvé");
-                                // TODO Cliquer sur le jalon
+                                InteractionsUI.SimpleClickToPoint(gUserSettings.Value.pointMilieu); // On annule déplacement
+                                clickDrapeau(gChasseEnCours.nbCurrentFlag);
+                            }
+                        } else if (gChasseEnCours.positionIndice != null)
+                        {
+                            // Si on est arrivé a la position de l'indice
+                            if (Int32.Parse(gCurrentPlayerPosition.posX) == gChasseEnCours.positionIndice.Value.x && Int32.Parse(gCurrentPlayerPosition.posY) == gChasseEnCours.positionIndice.Value.y)
+                            {
+                                clickDrapeau(gChasseEnCours.nbCurrentFlag);
                             }
                         }
                     }
@@ -161,7 +170,7 @@ namespace AmaknaProxy.Sniffer.Bot
             gChasseEnCours = null;
 
             try {
-                if (isActive)
+                if (gIsActive)
                 {
                     // Si chasse non terminée
                     if (pEventChasse.totalStepCount > 0)
@@ -174,6 +183,8 @@ namespace AmaknaProxy.Sniffer.Bot
                             TreasureHuntStep currentStep = pEventChasse.knownStepsList[nbCurrentFlag];
 
                             gChasseEnCours = new ChasseDetail();
+
+                            gChasseEnCours.nbCurrentFlag = nbCurrentFlag;
 
                             if (currentStep.TypeId == TreasureHuntStepFollowDirectionToHint.Id) // Cas phorreurs
                             {
@@ -203,7 +214,7 @@ namespace AmaknaProxy.Sniffer.Bot
 
                             // WindowManager.MainWindow.Logger.Info("TreasureHuntMessage, map X: " + gChasseEnCours.currentStartMap.Value.posX + ", map Y: " + gChasseEnCours.currentStartMap.Value.posY + ", flags posés: " + nbCurrentFlag + ", Indice ID: " + gChasseEnCours.idIndice + ", direction: " + gChasseEnCours.direction);
                             // Si le joueur est sur la case de départ de l'indice on le déplace au nouvel indice
-                            if (currentPlayerPosition.id == gChasseEnCours.currentStartMap.Value.id)
+                            if (gCurrentPlayerPosition.id == gChasseEnCours.currentStartMap.Value.id)
                             {
                                 goToHint();
                             }
@@ -211,8 +222,7 @@ namespace AmaknaProxy.Sniffer.Bot
                         else
                         {
                             WindowManager.MainWindow.Logger.Info("Etape terminée");
-                            // TODO -> Validation de l'etape
-                            // detecter si erreur (si oui arreter le mode auto)
+                            clickLoupe(nbCurrentFlag);
                         }
                     } else
                     {
@@ -268,13 +278,45 @@ namespace AmaknaProxy.Sniffer.Bot
                             return;
                     }
 
-                    hintFinder.HintMap objPosIndice = gObjHintFinder.searchFromId(hintFinderIndiceId, int.Parse(startPosX), int.Parse(startPosY), objDirection); // Récuperationb de la position de l'indice
-                                        
-                    doTravelToPosition(objPosIndice.x, objPosIndice.y);
+                    hintFinder.HintMap objPosIndice = gObjHintFinder.searchFromId(hintFinderIndiceId, int.Parse(startPosX), int.Parse(startPosY), objDirection); // Récuperation de la position de l'indice
+
+                    gChasseEnCours.positionIndice = objPosIndice;
+
+                    InteractionsUI.doTravelToPosition(objPosIndice.x, objPosIndice.y);
                 }
                 else if (gChasseEnCours.typeIndice == typeIndiceEnum.PHORREUR)
                 {
-                    // TODO
+                    // On travel de 10 cases, quand le phorreur sera trouvé sur la map l'event sera annulé
+                    int posX;
+                    int posY;
+
+                    switch (gChasseEnCours.direction)
+                    {
+                        case "0": // Droite
+                            posY = Int32.Parse(gChasseEnCours.currentStartMap.Value.posY);
+                            posX = Int32.Parse(gChasseEnCours.currentStartMap.Value.posX) + 10;
+                            break;
+
+                        case "2": // Bas
+                            posY = Int32.Parse(gChasseEnCours.currentStartMap.Value.posY + 10);
+                            posX = Int32.Parse(gChasseEnCours.currentStartMap.Value.posX);
+                            break;
+
+                        case "4": // Gauche
+                            posY = Int32.Parse(gChasseEnCours.currentStartMap.Value.posY);
+                            posX = Int32.Parse(gChasseEnCours.currentStartMap.Value.posX) - 10;
+                            break;
+
+                        case "6": // Haut
+                            posY = Int32.Parse(gChasseEnCours.currentStartMap.Value.posY) - 10;
+                            posX = Int32.Parse(gChasseEnCours.currentStartMap.Value.posX);
+                            break;
+                        default:
+                            WindowManager.MainWindow.Logger.Error("Erreur: Direction inconnue");
+                            return;
+                    }
+
+                    InteractionsUI.doTravelToPosition(posX, posY);
                 } 
                 else
                 {
@@ -286,33 +328,30 @@ namespace AmaknaProxy.Sniffer.Bot
             }
         }
 
-        public void doTravelToPosition(int posX, int posY)
+        /// <summary>
+        /// Clic sur un drapeau
+        /// </summary>
+        /// <param name="nbDrapeau">x eme drapeau a cliquer</param>
+        /// <param name="offSet">Décalage en px entre chaque drapeau</param>
+        public void clickDrapeau(int nbDrapeau, int offSet = 29)
         {
-            string travelCommand = "/travel " + posX + " " + posY;
+            int posY = gUserSettings.Value.drapeau1.Y + (nbDrapeau * offSet);
+            Point pointToClick = new Point(gUserSettings.Value.drapeau1.X, posY);
 
-            WindowManager.MainWindow.Logger.Info("Indice trouvé, commande copiée: " + travelCommand);
-            copyToClipboard(travelCommand);
-
-            Thread thread = new Thread(() => {
-                Thread.Sleep(500);
-                SendKeys.SendWait("^{ENTER}"); //Control + Entree -> Entre en ecriture dans le chat
-                Thread.Sleep(100);
-                SendKeys.SendWait("^{v}"); //Control + V -> Copie le travel
-                Thread.Sleep(100);
-                SendKeys.SendWait("{ENTER}"); //Enter -> Envoi la commande travel
-                Thread.Sleep(400);
-                SendKeys.SendWait("{ENTER}"); //Enter -> Valide le travel
-            });
-
-            thread.Start();
+            InteractionsUI.SimpleClickToPoint(pointToClick);
         }
 
-        public void copyToClipboard(string command)
+        public void clickLoupe(int nbDrapeau, int offSet = 29)
         {
-            Thread thread = new Thread(() => Clipboard.SetText(command));
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
-            thread.Join();
+            int posYDernierDrapeau = gUserSettings.Value.drapeau1.Y + ((nbDrapeau - 1) * offSet);
+
+            int posYLoupe = posYDernierDrapeau + 36;
+            int posXLoupe = gUserSettings.Value.drapeau1.X - 15;
+
+            Point pointToClick = new Point(posXLoupe, posYLoupe);
+
+            Thread.Sleep(250);
+            InteractionsUI.SimpleClickToPoint(pointToClick);
         }
     }
 }
