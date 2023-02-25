@@ -57,7 +57,7 @@ namespace AmaknaProxy.Sniffer.Bot
             return currentHint.clueid;
         }
 
-        public HintMap searchFromId(int hintId, int Xpos, int Ypos, Directions direction)
+        public HintMap? searchFromId(int hintId, int Xpos, int Ypos, Directions direction)
         {
             List<HintMap> maps = HintMapList.FindAll(map => {
                 switch (direction)
@@ -93,7 +93,7 @@ namespace AmaknaProxy.Sniffer.Bot
 
             maps = maps.FindAll(map => map.clues.Contains(hintId.ToString()));
 
-            HintMap hintFound = new HintMap();
+            HintMap? hintFound = null;
 
             switch (direction)
             {

@@ -145,6 +145,7 @@ namespace AmaknaProxy.Sniffer.Bot
                             {
                                 WindowManager.MainWindow.Logger.Info("Phorreur trouvé");
                                 InteractionsUI.SimpleClickToPoint(gUserSettings.Value.pointMilieu); // On annule déplacement
+                                Thread.Sleep(250);
                                 clickDrapeau(gChasseEnCours.nbCurrentFlag);
                             }
                         } else if (gChasseEnCours.positionIndice != null)
@@ -278,11 +279,17 @@ namespace AmaknaProxy.Sniffer.Bot
                             return;
                     }
 
-                    hintFinder.HintMap objPosIndice = gObjHintFinder.searchFromId(hintFinderIndiceId, int.Parse(startPosX), int.Parse(startPosY), objDirection); // Récuperation de la position de l'indice
+                    hintFinder.HintMap? objPosIndice = gObjHintFinder.searchFromId(hintFinderIndiceId, int.Parse(startPosX), int.Parse(startPosY), objDirection); // Récuperation de la position de l'indice
 
-                    gChasseEnCours.positionIndice = objPosIndice;
+                    if (objPosIndice != null)
+                    {
+                        gChasseEnCours.positionIndice = objPosIndice;
 
-                    InteractionsUI.doTravelToPosition(objPosIndice.x, objPosIndice.y);
+                        InteractionsUI.doTravelToPosition(objPosIndice.Value.x, objPosIndice.Value.y);
+                    } else
+                    {
+                        WindowManager.MainWindow.Logger.Error("Erreur: Indice inconnu");
+                    }
                 }
                 else if (gChasseEnCours.typeIndice == typeIndiceEnum.PHORREUR)
                 {
